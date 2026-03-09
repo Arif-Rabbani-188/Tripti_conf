@@ -33,18 +33,31 @@ const Scanner = ({ onScan, onClose }) => {
       scannerRef.current = html5QrCode;
 
       const config = {
-        fps: 20,
+        fps: 10,
         qrbox: (viewfinderWidth, viewfinderHeight) => {
           // Larger, more responsive box for barcodes
           const width = viewfinderWidth * 0.85;
           const height = Math.min(viewfinderHeight * 0.4, 200);
           return { width, height };
         },
-        // Remove fixed aspectRatio to allow natural camera resolution
+        aspectRatio: 1.0
       };
 
+      const devices = await Html5Qrcode.getCameras();
+      let cameraId = { facingMode: "environment" }; // Fallback
+      
+      if (devices && devices.length > 0) {
+        // সাধারণত শেষের ক্যামেরাটি মেইন ক্যামেরা হয় (Wide angle এড়াতে এটি ট্রাই করুন)
+        const backCamera = devices.find(device => 
+          device.label.toLowerCase().includes('back') && 
+          !device.label.toLowerCase().includes('wide')
+        ) || devices[devices.length - 1];
+
+        cameraId = backCamera.id;
+      }
+
       await html5QrCode.start(
-        { facingMode: "environment" },
+        cameraId,
         config,
         (decodedText) => {
           if (onScanRef.current) onScanRef.current(decodedText);
