@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Pos from './pages/Pos';
 import Inventory from './pages/Inventory';
 import Restock from './pages/Restock';
+import AddProduct from './pages/AddProduct';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="pos" element={<Pos />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="restock" element={<Restock />} />
+            <Route path="add-product" element={<AddProduct />} />
           </Route>
         </Routes>
       </BrowserRouter>

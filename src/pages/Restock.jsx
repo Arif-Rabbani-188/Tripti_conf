@@ -21,11 +21,32 @@ const Restock = () => {
   const fetchProductDetails = async (barcode) => {
     setIsFetching(true);
     try {
-      // First try open food facts
+      // 1. First check our Local Database
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || '';
+        const localResponse = await fetch(`${apiUrl}/api/products/${barcode}`);
+        if (localResponse.ok) {
+          const localData = await localResponse.json();
+          setFormData(prev => ({
+            ...prev,
+            name: localData.name,
+            quantityLabel: localData.unit,
+            imageUrl: localData.imageUrl || '',
+            sellPrice: localData.sellingPrice || 0,
+            category: 'General' // Define a default or map if needed
+          }));
+          setIsFetching(false);
+          return; // Exit early if found locally
+        }
+      } catch (localErr) {
+        console.warn("Local DB check failed, falling back to external API:", localErr);
+      }
+
+      // 2. If not found locally, try open food facts
       const foodResponse = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
       let data = foodResponse.ok ? await foodResponse.json() : null;
 
-      // If not found in food, try open beauty facts
+      // 3. If not found in food, try open beauty facts
       if (!data || !data.product) {
         const beautyResponse = await fetch(`https://world.openbeautyfacts.org/api/v2/product/${barcode}.json`);
         if (beautyResponse.ok) {
@@ -44,7 +65,6 @@ const Restock = () => {
             name: productName,
             quantityLabel: quantity,
             imageUrl: image,
-            // Try to map to our categories if possible, otherwise leave as General
             category: data.product.categories_tags?.some(c => c.includes('beverage')) ? 'Beverage' : 
                       data.product.categories_tags?.some(c => c.includes('snack')) ? 'Snacks' : 
                       data.product.categories_tags?.some(c => c.includes('sweet') || c.includes('chocolate')) ? 'Sweets' : 

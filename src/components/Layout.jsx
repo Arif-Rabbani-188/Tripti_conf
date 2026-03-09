@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, PlusCircle, Store } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, PlusCircle, Store, PlusSquare } from 'lucide-react';
 import clsx from 'clsx';
 
 const Layout = () => {
@@ -10,6 +10,7 @@ const Layout = () => {
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'POS / Sell', path: '/pos', icon: ShoppingCart },
     { name: 'Stock In / Buy', path: '/restock', icon: PlusCircle },
+    { name: 'Add Product', path: '/add-product', icon: PlusSquare },
     { name: 'Inventory', path: '/inventory', icon: Package },
   ];
 
